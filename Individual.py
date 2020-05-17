@@ -3,6 +3,7 @@ import utils
 import math
 import numpy as np
 from HMM import HMM
+#from HMM import HiddenMarkovModel as HMM
 
 #A Individual class for HMM model
 class Individual:
