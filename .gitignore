@@ -1,3 +1,4 @@
+.gitignore
 __pycache__
 test.mid
 process_data.py
