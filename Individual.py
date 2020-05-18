@@ -2,8 +2,8 @@
 import utils
 import math
 import numpy as np
-from HMM import HMM
-#from HMM import HiddenMarkovModel as HMM
+#from HMM import HMM
+from HMM import HiddenMarkovModel as HMM
 
 #A Individual class for HMM model
 class Individual:
@@ -27,7 +27,7 @@ class Individual:
 		else:
 			self.states = states
 		if observables is None:
-			self.observables = ['o{}'.format(i+1) for i in range(self.__class__.M)]
+			self.observables = ['{}'.format(i) for i in range(self.__class__.M)]
 		else:
 			self.observables = observables
 		self.model = HMM(self.states, self.observables)

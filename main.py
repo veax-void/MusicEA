@@ -6,16 +6,10 @@ Created on Mon May 18 13:41:59 2020
 """
 from midi_utils import midi_to_csv, csv_to_notes, notes_to_midi
 import numpy as np
-import argparse
 
-parser = argparse.ArgumentParser("cifar")
-parser.add_argument('--data', type=str, default=None, help='location of midi file')
-args = parser.parse_args()
+def extract_notes(filename):
+	midi_filename = filename
 
-def main():
-	if args.data is not None:
-		midi_filename = args.data
-	
 	csv_midi = midi_to_csv(midi_filename)
 	print(csv_midi.shape, csv_midi, '\n')
 
@@ -28,6 +22,6 @@ def main():
 	
 	midi_file = notes_to_midi(midi_filename, ten_notes, new_mini_name)
 	
-	
-if __name__ == '__main__':
-	main()
+	return csv_midi, notes
+#if __name__ == '__main__':
+csv_midi, notes = extract_notes('../data/bwv988.mid')

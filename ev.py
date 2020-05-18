@@ -7,10 +7,10 @@ import optparse
 import sys
 import yaml
 import math
+import time
 from random import Random
 from Population import *
 import utils
-
 
 #EV3 Config class 
 class EV3_Config:
@@ -90,11 +90,10 @@ def ev3(cfg, obs_seq):
 	normprng.seed(cfg.randomSeed+101)
 
 	#set static params on classes
-	# (probably not the most elegant approach, but let's keep things simple...)
 	Individual.minLimit = cfg.minLimit
 	Individual.maxLimit = cfg.maxLimit
-	Individual.N = 2
-	Individual.M = 3
+	Individual.N = 10
+	Individual.M = 128
 	Individual.uniprng = uniprng
 	Individual.normprng = normprng
 	Population.uniprng = uniprng
@@ -115,6 +114,7 @@ def ev3(cfg, obs_seq):
 
 	#evolution main loop
 	for i in range(cfg.generationCount):
+		start_time = time.time()
 		#create initial offspring population by copying parent pop
 		offspring=population.copy()
 		
@@ -135,10 +135,11 @@ def ev3(cfg, obs_seq):
 		population.truncateSelect(cfg.populationSize)
 		
 		#print population stats	
-		printStats(population,i+1)
+		#printStats(population,i+1)
 		
 		#accumulate & print stats    
 		stats.accumulate(population)
+		print("[INFO] {}/{} Generation finished in {} minutes".format(i+1, cfg.generationCount, (time.time() - start_time) / 60))
 		stats.print()
 	#plot accumulated stats to file/screen using matplotlib
 	stats.plot()
@@ -156,6 +157,7 @@ def main(argv=None):
 		#
 		parser = optparse.OptionParser()
 		parser.add_option("-i", "--input", action="store", dest="inputFileName", help="input filename", default=None)
+		parser.add_option("-m", "--music", action="store", dest="musicFile", help="music filename", default=None)
 		parser.add_option("-q", "--quiet", action="store_true", dest="quietMode", help="quiet mode", default=False)
 		parser.add_option("-d", "--debug", action="store_true", dest="debugMode", help="debug mode", default=False)
 		(options, args) = parser.parse_args(argv)
@@ -171,7 +173,10 @@ def main(argv=None):
 		print(cfg)
 
 		#obs_seq = ['3L', '2M', '1S', '2M', '1S', '3L', '3L', '3L']
-		obs_seq = ['o1', 'o1', 'o1', 'o2', 'o1', 'o3', 'o3', 'o3']
+		#obs_seq = ['o1', 'o1', 'o1', 'o2', 'o1', 'o3', 'o3', 'o3']
+		_, notes = utils.extract_notes(options.musicFile) #('../data/bwv988.mid')
+		print(notes.shape)
+		obs_seq = list(notes)
 					
 		#run EV3
 		ev3(cfg, obs_seq)

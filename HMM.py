@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu May 14 20:07:46 2020
+Created on Sat May 16 10:38:24 2020
 
 @author: veax-void
-N - number of latent (hidden) states 
-M - number of observables
-pi - initial state probability distribution
-O - observations
-A - transition matrix
-B - emission matrix
 """
 import numpy as np
 import pandas as pd
 from itertools import product
+from functools import reduce
 
 class ProbabilityVector:
 	def __init__(self, probabilities: dict):
@@ -156,23 +151,41 @@ class HiddenMarkovChain:
 		E = ProbabilityMatrix.initialize(states, observables)
 		pi = ProbabilityVector.initialize(states)
 		return cls(T, E, pi)
-
-	def uncover(self, observations: list) -> list:
-		alphas = self._alphas(observations)
-		betas = self._betas(observations)
-		maxargs = (alphas * betas).argmax(axis=1)
-		return list(map(lambda x: self.states[x], maxargs))
-
+	
+	def _create_all_chains(self, chain_length):
+		return list(product(*(self.states,) * chain_length))
+	
+	def _alphas(self, observations: list) -> np.ndarray:
+		self.scale_factor = np.zeros(len(observations))
+		alphas = np.zeros((len(observations), len(self.states)))
+		
+		alphas[0, :] = self.pi.values * self.E[observations[0]].T
+		# Scale alpha 0
+		self.scale_factor[0] = 1 / np.sum(alphas[0, :])
+		alphas[0, :] = alphas[0, :] * self.scale_factor[0] 
+		
+		for t in range(1, len(observations)):
+			alphas[t, :] = (alphas[t - 1, :].reshape(1, -1) 
+						 @ self.T.values) * self.E[observations[t]].T
+			# Scale alpha
+			self.scale_factor[t] = 1 / np.sum(alphas[t, :])
+			alphas[t, :] = alphas[t, :] * self.scale_factor[t]	 
+		return alphas
+	
 	def score(self, observations: list) -> float:
 		alphas = self._alphas(observations)
-		return float(alphas[-1].sum())
+		return -1 * np.sum(np.log(self.scale_factor)) #float(alphas[-1].sum())
 	
-	def run(self, length: int) -> (list, list):
+	def run(self, length: int, pi_state:list=None) -> (list, list):
 		assert length >= 0, "The chain needs to be a non-negative number."
 		s_history = [0] * (length + 1)
 		o_history = [0] * (length + 1)
 		
-		prb = self.pi.values
+		if pi_state is None:
+			prb = self.pi.values
+		else:
+			prb = pi_state
+			
 		obs = prb @ self.E.values
 		s_history[0] = np.random.choice(self.states, p=prb.flatten())
 		o_history[0] = np.random.choice(self.observables, p=obs.flatten())
@@ -183,121 +196,35 @@ class HiddenMarkovChain:
 			s_history[t] = np.random.choice(self.states, p=prb.flatten())
 			o_history[t] = np.random.choice(self.observables, p=obs.flatten())
 		
+		# return observations and state historys
 		return o_history, s_history
-	
-	def _create_all_chains(self, chain_length):
-		return list(product(*(self.states,) * chain_length))
-	
-	def _alphas(self, observations: list) -> np.ndarray:
-		alphas = np.zeros((len(observations), len(self.states)))
-		#print('hmm', self.pi.values, self.E)
-		alphas[0, :] = self.pi.values * self.E[observations[0]].T
-		for t in range(1, len(observations)):
-			alphas[t, :] = (alphas[t - 1, :].reshape(1, -1) @ self.T.values) \
-						 * self.E[observations[t]].T
-		return alphas
-	
-	def _betas(self, observations: list) -> np.ndarray:
-		betas = np.zeros((len(observations), len(self.states)))
-		betas[-1, :] = 1
-		for t in range(len(observations) - 2, -1, -1):
-			betas[t, :] = (self.T.values @ (self.E[observations[t + 1]] \
-						* betas[t + 1, :].reshape(-1, 1))).reshape(1, -1)
-		return betas
-	
-	def _digammas(self, observations: list) -> np.ndarray:
-		L, N = len(observations), len(self.states)
-		digammas = np.zeros((L - 1, N, N))
-
-		alphas = self._alphas(observations)
-		betas = self._betas(observations)
-		score = self.score(observations)
-		for t in range(L - 1):
-			P1 = (alphas[t, :].reshape(-1, 1) * self.T.values)
-			P2 = self.E[observations[t + 1]].T * betas[t + 1].reshape(1, -1)
-			digammas[t, :, :] = P1 * P2 / score
-		return digammas 
 
 class HiddenMarkovModel:
-	def __init__(self, hmc: HiddenMarkovChain):
-		self.layer = hmc
-		self._score_init = 0
-		self.score_history = []
-
-	@classmethod
-	def initialize(cls, states: list, observables: list):
-		layer = HiddenMarkovChain.initialize(states, observables)
-		return cls(layer)
-
-	def update(self, observations: list) -> float:
-		alpha = self.layer._alphas(observations)
-		beta = self.layer._betas(observations)
-		digamma = self.layer._digammas(observations)
-		score = alpha[-1].sum()
-		gamma = alpha * beta / score 
-
-		L = len(alpha)
-		obs_idx = [self.layer.observables.index(x) for x in observations]
-		capture = np.zeros((L, len(self.layer.states), len(self.layer.observables)))
-		for t in range(L):
-			capture[t, :, obs_idx[t]] = 1.0
-
-		pi = gamma[0]
-		T = digamma.sum(axis=0) / gamma[:-1].sum(axis=0).reshape(-1, 1)
-		E = (capture * gamma[:, :, np.newaxis]).sum(axis=0) / gamma.sum(axis=0).reshape(-1, 1)
-
-		self.layer.pi = ProbabilityVector.from_numpy(pi, self.layer.states)
-		self.layer.T = ProbabilityMatrix.from_numpy(T, self.layer.states, self.layer.states)
-		self.layer.E = ProbabilityMatrix.from_numpy(E, self.layer.states, self.layer.observables)
-			
-		return score
-
-	def train(self, observations: list, epochs: int, tol=None):
-		self._score_init = 0
-		self.score_history = (epochs + 1) * [0]
-		early_stopping = isinstance(tol, (int, float))
-		
-		for epoch in range(1, epochs + 1):
-			score = self.update(observations)
-			print("Training... epoch = {} out of {}, score = {}.".format(epoch, epochs, score))
-			if early_stopping and abs(self._score_init - score) / score < tol:
-				print("Early stopping.")
-				break
-			self._score_init = score
-			self.score_history[epoch] = score
-		
-class HMM:
-	def __init__(self, states, observables):
-		# Initialize HiddenMarkovModel
-		hmc = HiddenMarkovChain.initialize(states, observables)
-		self.model = HiddenMarkovModel(hmc)
-
-	def fit(self, observations, epochs, tolerance=None):
-		self.model.train(observations, epochs, tolerance)
+	def __init__(self, states:list, observables:list):
+		self.layer = HiddenMarkovChain.initialize(states, observables)
+		self._score = 0
 	
-	def score(self, observations):
-		return self.model.layer.score(observations)
+	def score(self, observations: list) -> float:
+		return self.layer.score(observations)
 
-	def generate(self, length):
-		chain = self.model.layer.run(length)[0]
-		return chain
+	def generate(self, length:int, pi_state:list=None) -> (list,list):
+		return self.layer.run(length, pi_state)
 	
 	def get_A(self):
-		return self.model.layer.T.df.to_numpy().copy()
+		return self.layer.T.df.to_numpy().copy()
 	def get_B(self):
-		return self.model.layer.E.df.to_numpy().copy()
+		return self.layer.E.df.to_numpy().copy()
 	def get_pi(self):
-		return self.model.layer.pi.df.to_numpy()[0].copy()
+		return self.layer.pi.df.to_numpy()[0].copy()
 	
 	def set_A(self, A):
-		self.model.layer.T = ProbabilityMatrix.from_numpy(A,
-				  self.model.layer.T.states, self.model.layer.T.observables)
+		self.layer.T = ProbabilityMatrix.from_numpy(A,
+				  self.layer.T.states, self.layer.T.observables)
 		
 	def set_B(self, B):
-		self.model.layer.E = ProbabilityMatrix.from_numpy(B, 
-				  self.model.layer.E.states, self.model.layer.E.observables)
+		self.layer.E = ProbabilityMatrix.from_numpy(B, 
+				  self.layer.E.states, self.layer.E.observables)
 		
 	def set_pi(self, pi):
-		self.model.layer.pi = ProbabilityVector.from_numpy(pi,
-				  self.model.layer.pi.states)
-	
+		self.layer.pi = ProbabilityVector.from_numpy(pi,
+				  self.layer.pi.states)
