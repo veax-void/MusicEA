@@ -45,27 +45,3 @@ def notes_to_midi(midi_filename:str, notes:np.ndarray,new_mini_name:str):
     with open(new_mini_name, "wb") as output_file:
         midi_writer = py_midicsv.FileWriter(output_file)
         midi_writer.write(midi_object)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
