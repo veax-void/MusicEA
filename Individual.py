@@ -1,9 +1,14 @@
-# Individual.py
-import utils
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May 16 10:38:24 2020
+Individual class
+"""
 import math
 import numpy as np
-from HMM import HMM
-#from HMM import HiddenMarkovModel as HMM
+
+import utilities.utils as utils
+from utilities.HMM import HiddenMarkovModel as HMM
 
 #A Individual class for HMM model
 class Individual:

@@ -1,6 +1,10 @@
-#
-# Population.py
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May 16 10:38:24 2020
 
+Population class
+"""
 import copy
 import math
 from operator import attrgetter
