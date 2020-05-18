@@ -92,7 +92,7 @@ def ev3(cfg, obs_seq):
 	#set static params on classes
 	Individual.minLimit = cfg.minLimit
 	Individual.maxLimit = cfg.maxLimit
-	Individual.N = 10
+	Individual.N = 2
 	Individual.M = 128
 	Individual.uniprng = uniprng
 	Individual.normprng = normprng
@@ -105,7 +105,7 @@ def ev3(cfg, obs_seq):
 	population.evaluateFitness(obs_seq)		
 		
 	#print initial pop stats	
-	printStats(population,0)
+	#printStats(population,0)
 
 	#accumulate & print stats
 	stats = utils.EV_Stats()
