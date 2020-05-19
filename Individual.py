@@ -6,7 +6,6 @@ Individual class
 """
 import math
 import numpy as np
-
 import utilities.utils as utils
 from utilities.HMM import HiddenMarkovModel as HMM
 
