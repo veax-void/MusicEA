@@ -6,6 +6,7 @@ Created on Mon May 18 17:37:38 2020
 # import sys
 # import yaml
 # import math
+import time
 from random import Random
 from utilities.utils import printStats, EV_Stats
 from Population import Population
@@ -43,7 +44,7 @@ class EV:
 		population.evaluateFitness()
 
 # 		print initial pop stats
-		printStats(population, 0)
+		#printStats(population, 0)
 
 		#accumulate & print stats
 		stats = EV_Stats()
@@ -52,6 +53,7 @@ class EV:
 
 		#evolution main loop
 		for i in range(self.config.generationCount):
+			gen_start = time.time()
 			#create initial offspring population by copying parent pop
 			offspring=population.copy()
 
@@ -72,12 +74,14 @@ class EV:
 			population.truncateSelect(self.config.populationSize)
 
 			#print population stats
-			printStats(population,i+1)
+			#printStats(population,i+1)
 
 # 			accumulate & print stats
 			stats.accumulate(population)
 			stats.print()
+			print("[INFO] Generation {} finished in {} minutes".format(i+1, (time.time() - gen_start)/60))
 # 		plot accumulated stats to file/screen using matplotlib
 		stats.plot()
+		return stats
 
 

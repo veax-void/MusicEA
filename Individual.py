@@ -30,7 +30,7 @@ class Individual:
 		else:
 			self.states = states
 		if observables is None:
-			self.observables = ['o{}'.format(i+1) for i in range(self.__class__.nObservableStates)]
+			self.observables = ['{}'.format(i+1) for i in range(self.__class__.nObservableStates)]
 		else:
 			self.observables = observables
 		self.model = HMM(self.states, self.observables)
