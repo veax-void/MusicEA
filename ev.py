@@ -92,7 +92,7 @@ def ev3(cfg, obs_seq):
 	#set static params on classes
 	Individual.minLimit = cfg.minLimit
 	Individual.maxLimit = cfg.maxLimit
-	Individual.N = 2
+	Individual.N = 10
 	Individual.M = 128
 	Individual.uniprng = uniprng
 	Individual.normprng = normprng
@@ -141,6 +141,7 @@ def ev3(cfg, obs_seq):
 		stats.accumulate(population)
 		print("[INFO] {}/{} Generation finished in {} minutes".format(i+1, cfg.generationCount, (time.time() - start_time) / 60))
 		stats.print()
+		utils.save_model(stats.bestState[-1],"best_hmm.pickle")
 	#plot accumulated stats to file/screen using matplotlib
 	stats.plot()
 		

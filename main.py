@@ -6,6 +6,8 @@ Created on Mon May 18 13:41:59 2020
 """
 from midi_utils import midi_to_csv, csv_to_notes, notes_to_midi
 import numpy as np
+import pickle
+from HMM import HiddenMarkovModel as HMM
 
 def extract_notes(filename):
 	midi_filename = filename
@@ -25,3 +27,16 @@ def extract_notes(filename):
 	return csv_midi, notes
 #if __name__ == '__main__':
 csv_midi, notes = extract_notes('../data/bwv988.mid')
+with open("best_hmm.pickle", 'rb') as f:
+	state = pickle.load(f)
+
+[pi, A, B] = state
+st = ['h{}'.format(i+1) for i in range(len(pi))]
+ob = ['{}'.format(i) for i in range(128)]
+model = HMM(st, ob)
+model.set_pi(pi)
+model.set_A(A)
+model.set_B(B)
+
+sample = model.generate(len(notes))
+

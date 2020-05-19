@@ -1,3 +1,4 @@
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean,stdev
@@ -11,6 +12,10 @@ def generate_prob_vector(length):
 def normalize(x):
 	x /= x.sum(axis = 0)
 	return x
+
+def save_model(model, filename):
+	with open(filename, 'wb') as f:
+		pickle.dump(model, f)
 
 def extract_notes(filename, save = False):
 	midi_filename = filename
