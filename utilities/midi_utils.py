@@ -3,6 +3,11 @@
 """
 Created on Mon May 18 13:50:37 2020
 """
+import sys
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(path)
+
 import py_midicsv
 import numpy as np
 import pandas as pd

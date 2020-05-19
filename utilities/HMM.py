@@ -3,6 +3,11 @@
 """
 Created on Sat May 16 10:38:24 2020
 """
+import sys
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(path)
+
 import numpy as np
 import pandas as pd
 from itertools import product

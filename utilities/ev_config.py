@@ -3,6 +3,11 @@
 """
 Created on Mon May  4 11:51:54 2020
 """
+import sys
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(path)
+
 import yaml
 
 #EV Config class
