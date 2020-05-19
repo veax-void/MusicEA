@@ -4,6 +4,24 @@ import matplotlib.pyplot as plt
 from statistics import mean,stdev
 from midi_utils import midi_to_csv, csv_to_notes, notes_to_midi
 
+#Print some useful stats to screen
+def printStats(pop,gen):
+	print('Generation:',gen)
+	avgval=0
+	maxval=pop[0].fit 
+	sigma=pop[0].sigma
+	for ind in pop:
+		avgval+=ind.fit
+		if ind.fit > maxval:
+			maxval=ind.fit
+			sigma=ind.sigma
+		#print(ind)
+
+	print('Max fitness',maxval)
+	print('Sigma',sigma)
+	print('Avg fitness',avgval/len(pop))
+	print('')
+
 def generate_prob_vector(length):
 	rand = np.random.rand(length)
 	rand /= rand.sum(axis = 0)
