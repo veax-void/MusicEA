@@ -1,6 +1,8 @@
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from statistics import mean,stdev
+from midi_utils import midi_to_csv, csv_to_notes, notes_to_midi
 
 #Print some useful stats to screen
 def printStats(pop,gen):
@@ -28,6 +30,28 @@ def generate_prob_vector(length):
 def normalize(x):
 	x /= x.sum(axis = 0)
 	return x
+
+def save_model(model, filename):
+	with open(filename, 'wb') as f:
+		pickle.dump(model, f)
+
+def extract_notes(filename, save = False):
+	midi_filename = filename
+
+	csv_midi = midi_to_csv(midi_filename)
+	print("csv_midi.shape: ", csv_midi.shape, '\n')
+
+	notes = csv_to_notes(csv_midi)
+	print("notes.shape", notes.shape, '\n')
+	
+	if save:
+		new_mini_name = 'ten_notes.mid'
+		ten_notes = np.zeros(notes.shape, dtype='int') + 10
+		ten_notes = np.array(ten_notes, dtype='str')
+	
+		midi_file = notes_to_midi(midi_filename, ten_notes, new_mini_name)
+	
+	return csv_midi, notes
 
 #Basic class for computing, managing, plotting EV3 run stats
 class EV_Stats:
