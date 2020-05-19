@@ -7,6 +7,10 @@ main.py: An elitist (mu+mu) generational-with-overlap EA ???
 To run: python main.py -i config.cfg
 
 """
+import sys
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(path)
 
 import argparse
 from utilities.ev_config import EV_Config
@@ -25,6 +29,7 @@ def init_flags_parser():
 
 
 def main(args = None):
+	print(args)
 	parser = init_flags_parser()
 	if isinstance(args, list):
 		# Parse args passed to the func
@@ -40,7 +45,7 @@ def main(args = None):
 
 
 	#Get EV3 config params
-	cfg = EV_Config(config_filename)
+	cfg = EV_Config(os.path.join(path,config_filename))
 
 	#print config params
 	print(cfg)
@@ -50,10 +55,10 @@ def main(args = None):
 # 		#obs_seq = ['3L', '2M', '1S', '2M', '1S', '3L', '3L', '3L']
 	observed_sequence = ['o1', 'o1', 'o1', 'o2', 'o1', 'o3', 'o3', 'o3']
 
-	#run evolution
+ 	#run evolution
 	ev = EV(cfg, observed_sequence)
 	ev.run()
 
 
 if __name__ == '__main__':
-	main(['-i', 'config.cfg'])
+ 	main(['-i', 'config.cfg'])
