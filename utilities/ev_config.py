@@ -18,9 +18,12 @@ class EV_Config:
              'crossoverFraction': (float,True),
              'minLimit': (float,True),
              'maxLimit': (float,True),
+             'nHiddenStates':(int,True),
+             'nObservableStates':(int,True),
+             'learningRateGlobal':(float,True),
+             
              'mode':(str,False),
              'degreeOfPolinomial':(int,False),
-             'learningRateGlobal':(float,False),
              'learningRateLocal':(float,False)}
 
     #constructor

@@ -8,6 +8,7 @@ import pandas as pd
 from itertools import product
 from functools import reduce
 
+
 class ProbabilityVector:
     def __init__(self, probabilities: dict):
         states = probabilities.keys()

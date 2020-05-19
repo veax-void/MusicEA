@@ -12,27 +12,26 @@ from utilities.HMM import HiddenMarkovModel as HMM
 
 #A Individual class for HMM model
 class Individual:
-	"""
-	Individual
-	"""
 	minSigma=1e-100
 	maxSigma=1
-	learningRate=1
-	N = 2		# Number of hidden states
-	M = 3		# Number of observables states
-	minLimit=None
-	maxLimit=None
-	uniprng=None
-	normprng=None
-	fitFunc=None
+
+	learningRate=None
+	minLimit = None
+	maxLimit = None
+	uniprng = None
+	normprng = None
+	nHiddenStates = None
+	nObservableStates = None
+
+	observed_sequence = None
 
 	def __init__(self, states = None, observables = None):
 		if states is None:
-			self.states = ['h{}'.format(i+1) for i in range(self.__class__.N)]
+			self.states = ['h{}'.format(i+1) for i in range(self.__class__.nHiddenStates)]
 		else:
 			self.states = states
 		if observables is None:
-			self.observables = ['o{}'.format(i+1) for i in range(self.__class__.M)]
+			self.observables = ['o{}'.format(i+1) for i in range(self.__class__.nObservableStates)]
 		else:
 			self.observables = observables
 		self.model = HMM(self.states, self.observables)
@@ -42,7 +41,7 @@ class Individual:
 		self.sigma = []
 		for _ in range(3):
 			self.sigma.append(self.uniprng.uniform(0.9,0.1)) #use "normalized" sigma
-		
+
 	def crossover(self, other):
 		#randomly choose position for model.pi
 		pos0 = self.uniprng.choice(range(len(self.x[0])))
@@ -66,17 +65,17 @@ class Individual:
 		self.x[1][pos1:] = tmp
 		self.model.set_A(self.x[1])
 		other.model.set_A(other.x[1])
-		
+
 		# Crossover for model.A
 		tmp = np.copy(other.x[2][pos2:])
 		other.x[2][pos2:] = self.x[2][pos2:]
 		self.x[2][pos2:] = tmp
 		self.model.set_B(self.x[2])
 		other.model.set_B(other.x[2])
-		
+
 		self.fit=None
 		other.fit=None
-	
+
 	def mutate(self):
 		for i in range(len(self.sigma)):
 			self.sigma[i] = self.sigma[i] * math.exp(self.learningRate * self.normprng.normalvariate(0,1))
@@ -102,10 +101,10 @@ class Individual:
 
 		self.fit = None
 
-	
-	def evaluateFitness(self, obs_seq):
+
+	def evaluateFitness(self):
 		if self.fit == None:
-			self.fit = self.model.score(obs_seq)
-		
+			self.fit = self.model.score(self.observed_sequence)
+
 	def __str__(self):
 		pass

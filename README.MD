@@ -1,4 +1,4 @@
 # To run the EV:
 	```
-	python ev.py -i config.cfg
+	python main.py -i config.cfg
 	```
