@@ -23,10 +23,9 @@ def init_flags_parser():
 	parser = argparse.ArgumentParser()
 	#parser.add_argument('-c', '--inputFile', action='store', help='File with configuration')
  	#parser.add_argument('-d', '--inputData', action='store', help='File with data')
-	#parser.add_argument('-q', '--quiet', action='store_true', help='Quiet mode', default=False)
-	parser.add_argument('--inputFile', type=str, default=None, help='configuration file')
-	parser.add_argument('--inputData', type=str, default=None, help='midi file')
-	parser.add_argument('--quiet', action = "store_true", default = False, help='quiet mode')
+	parser.add_argument('-c','--inputFile', type=str, default=None, help='configuration file')
+	parser.add_argument('-m', '--inputData', type=str, default=None, help='midi file')
+	parser.add_argument('-q', '--quiet', action = "store_true", default = False, help='quiet mode')
 	args = parser.parse_args()
 	return args
 
@@ -61,7 +60,7 @@ def main(args = None):
 	with open("stat_gen{}_hid{}.pickle".format(cfg.generationCount, cfg.nHiddenStates), 'wb') as f:
 		pickle.dump(stats, f)
 
-	return stats
-
 if __name__ == '__main__':
- 	stats = main()
+	start = time.time()
+	main()
+	print("[INFO] Finished in {} hours".format((time.time() - start)/3600))
