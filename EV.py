@@ -15,8 +15,9 @@ from multiprocessing import Pool
 
 class EV:
 
-	def __init__(self, config, observed_sequence):
+	def __init__(self, config, observed_sequence, obs_seq = None):
 		self.config = config
+		self.obs_seq = obs_seq
 
 		#start random number generators
 		uniprng = Random()
@@ -40,7 +41,7 @@ class EV:
 
 	def run(self):
 		#create initial Population (random initialization)
-		population = Population(self.config.populationSize)
+		population = Population(self.config.populationSize, self.obs_seq)
 		population.evaluateFitness()
 
 # 		print initial pop stats

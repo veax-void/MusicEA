@@ -13,6 +13,7 @@ import os
 path = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(path)
 
+import numpy as np
 import pickle
 import argparse
 from utilities.ev_config import EV_Config
@@ -51,10 +52,11 @@ def main(args = None):
 	#observed_sequence = ['o1', 'o1', 'o1', 'o2', 'o1', 'o3', 'o3', 'o3']
 	csv_file = midi.midi_to_csv(args.inputData)
 	notes = midi.csv_to_notes(csv_file)
+	obs_state = np.unique(notes)
 	observed_sequence = list(notes) 
 
  	#run evolution
-	ev = EV(cfg, observed_sequence)
+	ev = EV(cfg, observed_sequence, obs_state)
 	stats = ev.run()
 
 	with open("stat_gen{}_hid{}.pickle".format(cfg.generationCount, cfg.nHiddenStates), 'wb') as f:
