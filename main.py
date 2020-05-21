@@ -22,8 +22,6 @@ import utilities.midi_utils as midi
 
 def init_flags_parser():
 	parser = argparse.ArgumentParser()
-	#parser.add_argument('-c', '--inputFile', action='store', help='File with configuration')
- 	#parser.add_argument('-d', '--inputData', action='store', help='File with data')
 	parser.add_argument('-c','--inputFile', type=str, default=None, help='configuration file')
 	parser.add_argument('-m', '--inputData', type=str, default=None, help='midi file')
 	parser.add_argument('-q', '--quiet', action = "store_true", default = False, help='quiet mode')
@@ -52,14 +50,14 @@ def main(args = None):
 	#observed_sequence = ['o1', 'o1', 'o1', 'o2', 'o1', 'o3', 'o3', 'o3']
 	csv_file = midi.midi_to_csv(args.inputData)
 	notes = midi.csv_to_notes(csv_file)
-	obs_state = np.unique(notes)
+	obs_state = list(np.unique(notes))
 	observed_sequence = list(notes) 
 
  	#run evolution
 	ev = EV(cfg, observed_sequence, obs_state)
 	stats = ev.run()
 
-	with open("stat_gen{}_hid{}.pickle".format(cfg.generationCount, cfg.nHiddenStates), 'wb') as f:
+	with open("stat_gen{}_hid{}_state{}.pickle".format(cfg.generationCount, cfg.nHiddenStates, len(obs_state)), 'wb') as f:
 		pickle.dump(stats, f)
 
 if __name__ == '__main__':
