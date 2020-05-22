@@ -1,3 +1,9 @@
+import sys
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+print(path)
+sys.path.append(path)
+
 import pickle
 import sys
 import os
@@ -13,7 +19,7 @@ from midi_utils import midi_to_csv, csv_to_notes, notes_to_midi
 def printStats(pop,gen):
 	print('Generation:',gen)
 	avgval=0
-	maxval=pop[0].fit 
+	maxval=pop[0].fit
 	sigma=pop[0].sigma
 	for ind in pop:
 		avgval+=ind.fit
@@ -48,14 +54,14 @@ def extract_notes(filename, save = False):
 
 	notes = csv_to_notes(csv_midi)
 	print("notes.shape", notes.shape, '\n')
-	
+
 	if save:
 		new_mini_name = 'ten_notes.mid'
 		ten_notes = np.zeros(notes.shape, dtype='int') + 10
 		ten_notes = np.array(ten_notes, dtype='str')
-	
+
 		midi_file = notes_to_midi(midi_filename, ten_notes, new_mini_name)
-	
+
 	return csv_midi, notes
 
 #Basic class for computing, managing, plotting EV3 run stats
@@ -73,7 +79,7 @@ class EV_Stats:
 		max_fit_state=pop[0].x
 		mut_strength = pop[0].sigma
 		for p in pop:
-			if p.fit > max_fit: 
+			if p.fit > max_fit:
 				 max_fit=p.fit
 				 max_fit_state=p.x
 				 mut_strength = p.sigma
