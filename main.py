@@ -37,7 +37,7 @@ def main(args=None):
 	if not args.inputFile:
 		raise Exception("Input config file not spesified! Use -c <filename>")
 	if not args.inputData:
-		raise Exception("Input config file not spesified! Use -c <filename>")
+		raise Exception("Input midi file not spesified! Use -m <filename>")
 
 
 	#Get EV3 config params
