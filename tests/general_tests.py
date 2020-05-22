@@ -4,6 +4,11 @@
 Created on Mon May 18 13:41:59 2020
 
 """
+import sys
+import os
+path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(path)
+
 from midi_utils import midi_to_csv, csv_to_notes, notes_to_midi
 from HMM import HiddenMarkovModel
 import numpy as np
