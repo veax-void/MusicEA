@@ -61,7 +61,9 @@ def main(args=None):
 
 	genNotes, _ = bestInd.model.generate(len(notes))
 	genNotes = np.array(genNotes)
-	midi.notes_to_midi(args.inputMidi, genNotes, args.save)
+	with open("{}.npy".format(args.saveName), 'wb')  as f:
+		np.save(f, genNotes)
+	midi.notes_to_midi(args.inputMidi, genNotes, args.saveName)
 
 if __name__ == '__main__':
 	main()
