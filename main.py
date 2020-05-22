@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon May 18 17:37:38 2020
-
-main.py: An elitist (mu+mu) generational-with-overlap EA ???
-To run: python main.py -i config.cfg
-
 """
 import time
 import sys
@@ -25,33 +21,35 @@ def init_flags_parser():
 	parser.add_argument('-c','--inputFile', type=str, default=None, help='configuration file')
 	parser.add_argument('-m', '--inputData', type=str, default=None, help='midi file')
 	parser.add_argument('-q', '--quiet', action = "store_true", default = False, help='quiet mode')
-	args = parser.parse_args()
-	return args
+	return parser
 
 
-def main(args = None):
-	args = init_flags_parser()
+def main(args=None):
+	parser = init_flags_parser()
 
-	if args.inputFile:
-		config_filename = args.inputFile
+	if isinstance(args, list):
+		# Parse args passed to the main function
+		args = parser.parse_args(args)
 	else:
-		raise Exception("Input config file not spesified! Use -i <filename>")
+		# Parse args from terminal
+		args = parser.parse_args()
+
+	if not args.inputFile:
+		raise Exception("Input config file not spesified! Use -c <filename>")
+	if not args.inputData:
+		raise Exception("Input config file not spesified! Use -c <filename>")
 
 
 	#Get EV3 config params
-	cfg = EV_Config(os.path.join(path,config_filename))
+	cfg = EV_Config(os.path.join(path, args.inputFile))
 
 	#print config params
 	print(cfg)
 
-
-	# Bad decision
-# 		#obs_seq = ['3L', '2M', '1S', '2M', '1S', '3L', '3L', '3L']
-	#observed_sequence = ['o1', 'o1', 'o1', 'o2', 'o1', 'o3', 'o3', 'o3']
 	csv_file = midi.midi_to_csv(args.inputData)
 	notes = midi.csv_to_notes(csv_file)
 	obs_state = list(np.unique(notes))
-	observed_sequence = list(notes) 
+	observed_sequence = list(notes)
 
  	#run evolution
 	ev = EV(cfg, observed_sequence, obs_state)
