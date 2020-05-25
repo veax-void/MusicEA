@@ -60,5 +60,5 @@ def main(args=None):
 
 if __name__ == '__main__':
 	start = time.time()
-	main(['-c', 'config.cfg', '-m', 'bwv988.mid'])
+	main()
 	print("[INFO] Finished in {} hours".format((time.time() - start)/3600))

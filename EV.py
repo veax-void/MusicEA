@@ -80,7 +80,7 @@ class EV:
 # 			accumulate & print stats
 			stats.accumulate(population)
 			stats.print()
-			print("[INFO] Generation {} finished in {:2.3} minutes".format(i+1, (time.time() - gen_start)/60))
+			print("[INFO] Generation {} finished in {} minutes".format(i+1, (time.time() - gen_start)/60))
 # 		plot accumulated stats to file/screen using matplotlib
 		stats.plot()
 		return stats
