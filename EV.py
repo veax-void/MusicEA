@@ -10,7 +10,7 @@ import utilities.midi_utils as midi
 from Population import Population
 from Individual import Individual
 from multiprocessing import Pool
-from utilities.utils import printStats, EV_Stats
+from utilities.utils import EV_Stats, save_model
 
 class EV:
     def __init__(self, config, midi_filename):
@@ -76,7 +76,6 @@ class EV:
             population.combinePops(offsprings)
             population.truncateSelect(self.config.populationSize)
 
-
             # accumulate & print stats
             stats.accumulate(population)
             stats.print()
@@ -87,6 +86,9 @@ class EV:
         stats.plot()
 
         # save statistics
-        with open("stat_gen{}_hid{}_state{}.pickle".format(
-            self.config.generationCount, self.config.nHiddenStates, len(self.observed_sequence)), 'wb') as f:
-            pickle.dump(stats, f)
+        f_name = "stat_gen{}_hid{}_state{}.pickle".format(
+            self.config.generationCount,
+            self.config.nHiddenStates,
+            len(self.observed_sequence))
+
+        save_model(stats, f_name)

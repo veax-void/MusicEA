@@ -13,12 +13,10 @@ class Population:
     crossoverFraction = None
     pool = None
 
-    def __init__(self, populationSize):
-        """
-        Population constructor
-        """
+    def __init__(self, population_size):
         self.population=[]
-        for i in range(populationSize):
+
+        for i in range(population_size):
             self.population.append(Individual())
 
     def __len__(self):
@@ -114,7 +112,7 @@ class Population:
         self.population=self.population[:newPopSize]
 
     def __str__(self):
-        s=''
+        s = ''
         for ind in self:
-            s+=str(ind) + '\n'
+            s += str(ind) + '\n'
         return s

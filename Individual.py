@@ -67,8 +67,8 @@ class Individual:
         self.model.set_B(self.x[2])
         other.model.set_B(other.x[2])
 
-        self.fit=None
-        other.fit=None
+        self.fit = None
+        other.fit = None
 
     def mutate(self):
         for i in range(len(self.sigma)):
