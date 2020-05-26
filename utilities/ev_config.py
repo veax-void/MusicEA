@@ -21,15 +21,17 @@ class EV_Config:
              'generationCount': (int,True),
              'randomSeed': (int,True),
              'crossoverFraction': (float,True),
-             'minLimit': (float,True),
-             'maxLimit': (float,True),
              'nHiddenStates':(int,True),
              'nObservableStates':(int,True),
-             'learningRateGlobal':(float,True),
-             
-             'mode':(str,False),
-             'degreeOfPolinomial':(int,False),
-             'learningRateLocal':(float,False)}
+             'learningRate':(float,True),
+			 'useFullSequence':(bool,True),
+
+             # 'minLimit': (float,False),
+             # 'maxLimit': (float,False),
+             # 'mode':(str,False),
+             # 'degreeOfPolinomial':(int,False),
+             # 'learningRateLocal':(float,False)
+			 }
 
     #constructor
     def __init__(self, inFileName):

@@ -15,13 +15,13 @@ class Population:
 	crossoverFraction = None
 	pool = None
 
-	def __init__(self, populationSize, obs_seq = None):
+	def __init__(self, populationSize):
 		"""
 		Population constructor
 		"""
 		self.population=[]
 		for i in range(populationSize):
-			self.population.append(Individual(observables = obs_seq))
+			self.population.append(Individual())
 
 	def __len__(self):
 		return len(self.population)
