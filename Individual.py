@@ -2,21 +2,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat May 16 10:38:24 2020
-Individual class
+Individual class for HMM model
 """
+
 import math
 import numpy as np
 import utilities.utils as utils
 from utilities.HMM import HiddenMarkovModel as HMM
 
-#A Individual class for HMM model
 class Individual:
     minSigma=1e-100
     maxSigma=1
 
     learningRate=None
-    uniprng = None
-    normprng = None
     nHiddenStates = None
 
     observed_sequence = None
@@ -30,25 +28,21 @@ class Individual:
 
         self.x = [self.model.get_pi(), self.model.get_A(), self.model.get_B()]
 
-        #self.fit = self.__class__.fitFunc(self.x)
-
         self.fit = None
 
-        self.sigma = []
+        self.sigma = [np.random.uniform(0.1,0.9) for _ in range(3)]
 
-        for _ in range(3):
-            self.sigma.append(self.uniprng.uniform(0.9,0.1)) #use "normalized" sigma
 
     def _generate_hidden_states(self):
-        self.hidden_states = [str(i) for i in range(self.nHiddenStates)]
+        self.hidden_states = [i for i in range(self.nHiddenStates)]
 
     def crossover(self, other):
         #randomly choose position for model.pi
-        pos0 = self.uniprng.choice(range(len(self.x[0])))
+        pos0 = np.random.choice(range(len(self.x[0])))
         #randomly choose position for model.A
-        pos1 = self.uniprng.choice(range(self.x[1].shape[0]))
+        pos1 = np.random.choice(range(self.x[1].shape[0]))
         #randomly choose position for model.B
-        pos2 = self.uniprng.choice(range(self.x[2].shape[0]))
+        pos2 = np.random.choice(range(self.x[2].shape[0]))
 
         # crossover for model.pi
         tmp = np.copy(other.x[0][pos0:])
@@ -78,24 +72,24 @@ class Individual:
 
     def mutate(self):
         for i in range(len(self.sigma)):
-            self.sigma[i] = self.sigma[i] * math.exp(self.learningRate * self.normprng.normalvariate(0,1))
+            self.sigma[i] = self.sigma[i] * math.exp(self.learningRate * np.random.normal(0,1))
             if self.sigma[i] < self.minSigma: self.sigma[i] = self.minSigma
             if self.sigma[i] > self.maxSigma: self.sigma[i] = self.maxSigma
 
         # Mutation for model.pi
-        if self.uniprng.random() < self.sigma[0]:
+        if np.random.uniform() < self.sigma[0]:
             self.x[0] = utils.generate_prob_vector(len(self.x[0]))
             self.model.set_pi(self.x[0])
 
         # Mutation for model.A
         for i in range(self.x[1].shape[0]):
-            if self.uniprng.random() < self.sigma[1]:
+            if np.random.uniform() < self.sigma[1]:
                 self.x[1][i] = utils.generate_prob_vector(len(self.x[1][i]))
         self.model.set_A(self.x[1])
 
         # Mutation for model.B
         for i in range(self.x[2].shape[0]):
-            if self.uniprng.random() < self.sigma[2]:
+            if np.random.uniform() < self.sigma[2]:
                 self.x[2][i] = utils.generate_prob_vector(len(self.x[2][i]))
         self.model.set_B(self.x[2])
 
@@ -107,4 +101,5 @@ class Individual:
             self.fit = self.model.score(self.observed_sequence)
 
     def __str__(self):
-        pass
+        return '[Individual. Fit:{:6.3f}; Sigmas:{:6.3f}-{:6.3f}-{:6.3f}]'.format(
+            self.fit, self.sigma[0],self.sigma[1],self.sigma[2])

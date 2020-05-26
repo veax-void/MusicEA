@@ -110,15 +110,8 @@ class ProbabilityMatrix:
         observables = np.array(observables)
         states = np.array(states)
 
-        # rand_matrix = np.random.rand(states.size, observables.size)
-        # rand_matrix /= rand_matrix.sum(axis=1).reshape(-1, 1)
-
-        # state_prob_matrix =
-
         rand = np.random.rand(states.size, len(observables)) / (states.size**2) + 1 / states.size
         rand /= rand.sum(axis=1).reshape(-1, 1)
-
-        # true_probabilities = [{i:np.sum(rand[observables == i])} for i in np.unique(observables)]
 
         aggr = [dict(zip(observables, rand[i, :])) for i in range(len(states))]
 

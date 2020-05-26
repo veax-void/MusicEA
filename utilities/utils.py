@@ -96,12 +96,10 @@ class EV_Stats:
 		#if gen not specified, print latest
 		if gen is None: gen=len(self.bestState)-1
 		print('Generation:',gen)
-		print('Best fitness  : ',self.bestFit[gen])
-		#print('Best state    : ',self.bestState[gen])
-		print('Mean fitness  : ',self.meanFit[gen])
-		print('Stddev fitness: ',self.stddevFit[gen])
-		print('Mutation Strength: ',self.mutationStrength[gen])
-		print('')
+		print('Best fitness     : {:6.3f}'.format(self.bestFit[gen]))
+		print('Mean fitness     : {:6.3f}'.format(self.meanFit[gen]))
+		print('Stddev fitness   : {:6.3f}'.format(self.stddevFit[gen]))
+		print('Mutation Strength: {}'.format(str(self.mutationStrength[gen])))
 
 	def plot(self):
 		#plot stats to screen & file using matplotlib

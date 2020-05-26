@@ -7,95 +7,86 @@ import time
 import pickle
 import numpy as np
 import utilities.midi_utils as midi
-from random import Random
 from Population import Population
 from Individual import Individual
 from multiprocessing import Pool
 from utilities.utils import printStats, EV_Stats
 
 class EV:
-	def __init__(self, config, midi_filename):
-		# Get sequence
-		csv_file = midi.midi_to_csv(midi_filename)
-		notes = midi.csv_to_notes(csv_file)
-		observed_sequence = list(notes)
+    def __init__(self, config, midi_filename):
+        # get sequence
+        csv_file = midi.midi_to_csv(midi_filename)
+        notes = midi.csv_to_notes(csv_file)
+        observed_sequence = notes.astype('int') #list(notes)
 
-		# States used in the individuals
-		if not config.useFullSequence:
-			observed_states = list(np.unique(notes))
-		else:
-			observed_states = np.arange(config.nObservableStates)
+        # states used in the individuals
+        if not config.useFullSequence:
+            observed_states = list(np.unique(observed_sequence))
+        else:
+            observed_states = np.arange(config.nObservableStates)
 
-		#start random number generators
-		uniprng = Random()
-		uniprng.seed(config.randomSeed)
-		normprng = Random()
-		normprng.seed(config.randomSeed)
+        # setup random number generator
+        np.random.seed(config.randomSeed)
 
-		# Individual init
-		Individual.observed_sequence = observed_sequence
-		Individual.nHiddenStates = config.nHiddenStates
-		Individual.learningRate = config.learningRate
-		Individual.observed_states = observed_states
-		Individual.normprng = normprng
-		Individual.uniprng = uniprng
+        # Individual initialization
+        Individual.observed_sequence = observed_sequence
+        Individual.nHiddenStates = config.nHiddenStates
+        Individual.learningRate = config.learningRate
+        Individual.observed_states = observed_states
 
-		# Population init
-		Population.uniprng = uniprng
-		Population.crossoverFraction = config.crossoverFraction
-		Population.pool = Pool()
+        # Population initialization
+        Population.crossoverFraction = config.crossoverFraction
+        Population.pool = Pool()
 
-		# Save sequence and config
-		self.config = config
-		self.observed_sequence = observed_sequence
+        # save sequence and config
+        self.config = config
+        self.observed_sequence = observed_sequence
 
-	def run(self):
-		#create initial Population (random initialization)
-		population = Population(self.config.populationSize)
-		population.evaluateFitness()
+    def run(self):
+        # create initial Population (random initialization)
+        population = Population(self.config.populationSize)
+        population.evaluateFitness()
 
-# 		print initial pop stats
-		#printStats(population, 0)
+        # accumulate & print stats
+        stats = EV_Stats()
+        stats.accumulate(population)
+        stats.print()
+        print()
 
-		#accumulate & print stats
-		stats = EV_Stats()
-		stats.accumulate(population)
-		stats.print()
+        # evolution main loop
+        for i in range(self.config.generationCount):
+            gen_start = time.time()
 
-		#evolution main loop
-		for i in range(self.config.generationCount):
-			gen_start = time.time()
-			#create initial offspring population by copying parent pop
-			offspring=population.copy()
+            #create initial offspring population by copying parent pop
+            offsprings = population.copy()
 
-			#select mating pool
-			offspring.conductTournament()
+            #select mating pool
+            offsprings.conductTournament()
 
-			#perform crossover
-			offspring.crossover()
+            #perform crossover
+            offsprings.crossover()
 
-			#random mutation
-			offspring.mutate()
+            #random mutation
+            offsprings.mutate()
 
-			#update fitness values
-			offspring.evaluateFitness()
+            #update fitness values
+            offsprings.evaluateFitness()
 
-			#survivor selection: elitist truncation using parents+offspring
-			population.combinePops(offspring)
-			population.truncateSelect(self.config.populationSize)
-
-			#print population stats
-			#printStats(population,i+1)
-
-# 			accumulate & print stats
-			stats.accumulate(population)
-			stats.print()
-			print("[INFO] Generation {} finished in {} minutes".format(i+1, (time.time() - gen_start)/60))
-# 		plot accumulated stats to file/screen using matplotlib
-		stats.plot()
-
-		with open("stat_gen{}_hid{}_state{}.pickle".format(
-			self.config.generationCount, self.config.nHiddenStates, len(self.observed_sequence)), 'wb') as f:
-			pickle.dump(stats, f)
+            #survivor selection: elitist truncation using parents+offspring
+            population.combinePops(offsprings)
+            population.truncateSelect(self.config.populationSize)
 
 
+            # accumulate & print stats
+            stats.accumulate(population)
+            stats.print()
+            print("[INFO] Generation {} finished in {:6.3f} minutes\n".format(
+                i+1, (time.time() - gen_start)/60))
+
+        # plot accumulated stats to file/screen using matplotlib
+        stats.plot()
+
+        # save statistics
+        with open("stat_gen{}_hid{}_state{}.pickle".format(
+            self.config.generationCount, self.config.nHiddenStates, len(self.observed_sequence)), 'wb') as f:
+            pickle.dump(stats, f)

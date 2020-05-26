@@ -24,13 +24,7 @@ class EV_Config:
              'nHiddenStates':(int,True),
              'nObservableStates':(int,True),
              'learningRate':(float,True),
-			 'useFullSequence':(bool,True),
-
-             # 'minLimit': (float,False),
-             # 'maxLimit': (float,False),
-             # 'mode':(str,False),
-             # 'degreeOfPolinomial':(int,False),
-             # 'learningRateLocal':(float,False)
+			 'useFullSequence':(bool,True)
 			 }
 
     #constructor
