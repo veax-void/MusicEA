@@ -58,4 +58,5 @@ def main(args=None):
 	print("[INFO] Finished in {:6.3f} hours".format((time.time() - start_time)/3600))
 
 if __name__ == '__main__':
-	main(['-c','config.cfg', '-m', 'Never-Gonna-Give-You-Up-1.mid'])
+    main()
+# 	main(['-c','config.cfg', '-m', 'data/Never-Gonna-Give-You-Up-1.mid'])

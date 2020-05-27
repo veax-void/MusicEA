@@ -115,7 +115,7 @@ class EV_Stats:
         plt.ylabel('Mutation Strength')
 
         #write plots to .png file, then display to screen
-        plt.savefig('ev3a.png')
+        plt.savefig('output/statistics.png')
         plt.show()
 
     def __str__(self):

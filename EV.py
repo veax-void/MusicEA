@@ -91,4 +91,4 @@ class EV:
             self.config.nHiddenStates,
             len(self.observed_sequence))
 
-        save_model(stats, f_name)
+        save_model(stats, 'output/'+f_name)
