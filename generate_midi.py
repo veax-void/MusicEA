@@ -69,6 +69,6 @@ def main(args=None):
     midi.notes_to_midi(midi_filename, genNotes, 'output/'+new_filename)
 
 if __name__ == '__main__':
-    main(['-m', 'Never-Gonna-Give-You-Up-1.mid',
-          '-b','stat_gen10_hid20_state7469.pickle',
+    main(['-m', 'data/Never-Gonna-Give-You-Up-1.mid',
+          '-b','output/stat_gen10_hid20_state7469.pickle',
           '-s', 'new_song'])
